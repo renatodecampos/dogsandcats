@@ -1,4 +1,5 @@
 import datetime
+import random
 import os
 from os import walk
 
@@ -7,16 +8,17 @@ from keras_preprocessing.image import ImageDataGenerator, np
 from keras.layers import Conv2D, MaxPooling2D, Dropout, Flatten, Dense, BatchNormalization
 from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
+import matplotlib.pyplot as plt
 
 
 class Testing:
 
     def __init__(self):
         labels = {
-            'dog': 1,
-            'cat': 0
+            1: 'dog',
+            0: 'cat'
         }
-        self.PATH = 'dataset/test_set'
+        self.PATH = '.\\dataset\\my_test'
         self.IMAGE_WIDTH = 128
         self.IMAGE_HEIGHT = 128
         self.IMAGE_SIZE = (self.IMAGE_WIDTH, self.IMAGE_HEIGHT)
@@ -28,11 +30,7 @@ class Testing:
         """
         Preparing Testing Data
         """
-        files = []
-        for (dirpath, dirnames, filenames) in walk(self.PATH):
-            for filename in filenames:
-                fullfilepath = os.path.join(dirpath, filename)
-                files.append(fullfilepath)
+        files = os.listdir(self.PATH)
 
         df = pd.DataFrame({
             'filename': files
@@ -78,12 +76,16 @@ class Testing:
 
     def run(self):
         test_df, nb_samples = self.getdataset()
+
+        print('Predicting {} samples'.format(nb_samples))
+
         test_gen = ImageDataGenerator(
             rescale=1. / 255
         )
 
         test_generator = test_gen.flow_from_dataframe(
             test_df,
+            directory=self.PATH,
             x_col='filename',
             y_col=None,
             class_mode=None,
@@ -103,11 +105,14 @@ class Testing:
         test_df['category'] = np.argmax(predict, axis=-1)
         test_df['category'] = test_df['category'].replace(self.LABEL_MAP)
 
-        sample_test = test_df.head(18)
+        test_df = test_df.sample(frac=1).reset_index(drop=True)
+
+        sample_test = test_df.head(50)
         sample_test.head()
 
         for index, row in sample_test.iterrows():
-            print('Predicted {0} and filename is {1}'.format(row['category'], row['filename']))
+            print('Predicted {0} with {1:0.1f}% and filename is {2}'.format(row['category'], max(predict[index]) * 100,
+                                                                            row['filename']))
 
 
 if __name__ == '__main__':

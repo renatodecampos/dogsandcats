@@ -2,13 +2,18 @@
   <dictionary name="renac">
     <words>
       <w>catsdogstrain</w>
+      <w>crossentropy</w>
       <w>dataframe</w>
+      <w>datagen</w>
       <w>dataset</w>
       <w>dirnames</w>
       <w>dirpath</w>
       <w>filenames</w>
       <w>fullfilepath</w>
       <w>getdataset</w>
+      <w>relu</w>
+      <w>rmsprop</w>
+      <w>softmax</w>
     </words>
   </dictionary>
 </component>

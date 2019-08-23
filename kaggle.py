@@ -94,6 +94,8 @@ class Training:
         # Adjuste Data
         df['category'] = df['category'].replace({0: 'cat', 1: "dog"})
 
+
+
         # Split Data
         train_df, validate_df = train_test_split(df, test_size=0.20, random_state=42)
         train_df = train_df.reset_index(drop=True)
@@ -148,6 +150,19 @@ class Training:
             steps_per_epoch=total_train // self.BATCH_SIZE,
             callbacks=self.create_callbacks()
         )
+
+        scores = model.evaluate_generator(
+            train_generator,
+            steps=total_train // self.BATCH_SIZE,
+            callbacks=None,
+            max_queue_size=10,
+            workers=1,
+            use_multiprocessing=False,
+            verbose=0
+        )
+
+        print('Test loss:', scores[0])
+        print('Test accuracy:', scores[1])
 
         model.save_weights('model.h5')
 
